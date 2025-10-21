@@ -1,6 +1,0 @@
-berisi fitur2
-misal
-- daily tracker
-- ecoenzim
-- notifikasi
-- profile
