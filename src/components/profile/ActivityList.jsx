@@ -216,7 +216,9 @@ function renderPrimaryText(activity) {
   const hasPoints =
     typeof activity.points === "number" && activity.points !== 0;
   const hasPrePoints =
-    typeof activity.pre_points === "number" && activity.pre_points !== 0;
+    typeof activity.prePoints === "number"
+      ? activity.prePoints !== 0
+      : typeof activity.pre_points === "number" && activity.pre_points !== 0;
 
   const segments = [];
   if (hasPoints) {
@@ -224,8 +226,12 @@ function renderPrimaryText(activity) {
     segments.push(`${prefix}${activity.points} points`);
   }
   if (hasPrePoints) {
-    const prefix = activity.pre_points > 0 ? "+" : "";
-    segments.push(`${prefix}${activity.pre_points} pre-points`);
+    const value =
+      typeof activity.prePoints === "number"
+        ? activity.prePoints
+        : activity.pre_points;
+    const prefix = value > 0 ? "+" : "";
+    segments.push(`${prefix}${value} pre-points`);
   }
 
   if (segments.length > 0) {

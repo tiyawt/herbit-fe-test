@@ -48,7 +48,7 @@ export default function RewardsPanel({ rewards, loading }) {
           setSelectedVoucher(null);
           setRedeemSuccess({
             ...voucher,
-            redeemed_at: new Date().toISOString(),
+            redeemedAt: new Date().toISOString(),
           });
         }}
       />
@@ -83,7 +83,8 @@ function RedeemDialog({ voucher, onClose, onConfirm }) {
               {voucher.description ?? "Voucher spesial untuk kamu"}
             </p>
             <p className="text-sm font-semibold text-[#F97316]">
-              Poin dibutuhkan: {voucher.points_required ?? 0} poin
+              Poin dibutuhkan:{" "}
+              {voucher.pointsRequired ?? voucher.points_required ?? 0} poin
             </p>
           </div>
           <button

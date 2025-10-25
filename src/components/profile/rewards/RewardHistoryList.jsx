@@ -24,8 +24,9 @@ export default function RewardHistoryList({ history = [] }) {
 }
 
 function HistoryCard({ item }) {
-  const dateLabel = item.redeemed_at
-    ? formatDateLabel(item.redeemed_at)
+  const redeemedAt = item.redeemedAt ?? item.redeemed_at;
+  const dateLabel = redeemedAt
+    ? formatDateLabel(redeemedAt)
     : "Tanggal tidak diketahui";
   const pointsLabel =
     typeof item.points === "number" && item.points > 0

@@ -27,8 +27,11 @@ function getInitials(source) {
 }
 
 function resolvePhotoUrl(user) {
+  if (user?.photoUrl) return user.photoUrl;
   if (user?.photo_url) return user.photo_url;
-  const base = getInitials(user?.username ?? user?.email ?? user?.name ?? "Teman Herbit");
+  const base = getInitials(
+    user?.username ?? user?.email ?? user?.name ?? "Teman Herbit"
+  );
   const params = new URLSearchParams({
     name: base,
     background: "FACC15",
@@ -151,8 +154,8 @@ function buildHomeSummary(db) {
     user: {
       id: user.id,
       name: user.username ?? user.email ?? "Teman Herbit",
-      photo_url: resolvePhotoUrl(user),
-      total_points: user.total_points ?? 0,
+      photoUrl: resolvePhotoUrl(user),
+      totalPoints: user.total_points ?? user.totalPoints ?? 0,
     },
     progress: {
       date: latestDate,
@@ -172,23 +175,76 @@ function buildActivities(db, user) {
   );
   const activities = [];
 
-  (db.daily_task_checklist ?? [])
-    .filter((entry) => entry.user_id === user.id)
-    .forEach((entry) => {
-      const task = tasksMap.get(entry.daily_task_id);
-      if (!task) return;
-      const dateValue = entry.completed_at ?? task.task_date;
+  const tasksByDate = new Map();
+  (db.daily_tasks ?? [])
+    .filter((task) => task.user_id === user.id)
+    .forEach((task) => {
+      const list = tasksByDate.get(task.task_date) ?? [];
+      list.push(task);
+      tasksByDate.set(task.task_date, list);
+    });
+
+  const completedChecklists = (db.daily_task_checklist ?? []).filter(
+    (entry) => entry.user_id === user.id && entry.is_completed
+  );
+  const checklistByTaskId = new Map(
+    completedChecklists.map((entry) => [entry.daily_task_id, entry])
+  );
+  const completedByDate = new Map();
+  completedChecklists.forEach((entry) => {
+    const task = tasksMap.get(entry.daily_task_id);
+    if (!task) return;
+    const list = completedByDate.get(task.task_date) ?? [];
+    list.push(entry);
+    completedByDate.set(task.task_date, list);
+  });
+
+  for (const [date, tasksInDay] of tasksByDate.entries()) {
+    const completedEntries = completedByDate.get(date) ?? [];
+    const allCompleted =
+      tasksInDay.length > 0 && completedEntries.length === tasksInDay.length;
+
+    if (allCompleted) {
+      const latestCompletion = completedEntries
+        .map((entry) => entry.completed_at ?? entry.created_at ?? date)
+        .sort((a, b) => new Date(b) - new Date(a))[0];
+
       activities.push({
-        id: `task-${entry.id}`,
-        type: "gain",
-        points: task.points_reward ?? 0,
+        id: `daily-${date}`,
+        type: "leaf",
+        metricLabel: "+5 daun hijau",
+        title: "Daily Habits sempurna!",
+        description: "Semua daily habits terselesaikan hari ini.",
+        timeLabel: formatDateLabel(latestCompletion ?? date, true),
+        _sortDate: latestCompletion ?? date,
+        periods: ["all", "week", "month"],
+      });
+      continue;
+    }
+
+    tasksInDay.forEach((task) => {
+      const checklist = checklistByTaskId.get(task.id);
+      if (!checklist) return;
+      const dateValue = checklist.completed_at ?? task.task_date;
+      const alreadyCollected = activities.some(
+        (activity) => activity._sortDate === dateValue && activity.type === "leaf" && activity.metricLabel === "+1 daun hijau"
+      );
+      if (alreadyCollected) {
+        return;
+      }
+      activities.push({
+        id: `task-${checklist.id}`,
+        type: "leaf",
+        metricLabel: "+1 daun hijau",
         title: task.title,
-        description: task.description,
+        description:
+          task.description ?? "Task selesai, pohonmu bertambah subur.",
         timeLabel: formatDateLabel(dateValue, true),
         _sortDate: dateValue,
         periods: ["all", "week", "month"],
       });
     });
+  }
 
   (db.ecoenzim_upload_progress ?? [])
     .filter((entry) => entry.user_id === user.id)
@@ -197,7 +253,7 @@ function buildActivities(db, user) {
       activities.push({
         id: entry.id,
         type: "gain",
-        pre_points: entry.pre_points_earned ?? 0,
+        prePoints: entry.pre_points_earned ?? entry.prePointsEarned ?? 0,
         title: `Upload progres eco-enzim bulan ke-${entry.month_number}`,
         description: "Progress eco-enzim terverifikasi",
         timeLabel: formatDateLabel(dateValue, true),
@@ -217,7 +273,7 @@ function buildActivities(db, user) {
       activities.push({
         id: entry.id,
         type: "redeem",
-        points: -(entry.points_deducted ?? 0),
+        points: -(entry.points_deducted ?? entry.pointsDeducted ?? 0),
         title: `Tukar voucher ${voucher?.name ?? "Reward"}`,
         description: voucher?.description ?? "Voucher berhasil ditukar",
         timeLabel: formatDateLabel(dateValue, true),
@@ -284,19 +340,30 @@ function buildRewardsSummary(db, user) {
     ),
   };
 
-  const vouchers = (db.vouchers ?? []).filter((voucher) => voucher.is_active);
-  const available = vouchers.map((voucher) => ({
-    id: voucher.id,
-    name: voucher.name,
-    description: voucher.description,
-    image: VOUCHER_IMAGES[voucher.id] ?? DEFAULT_VOUCHER_IMAGE,
-    banner: VOUCHER_IMAGES[voucher.id] ?? DEFAULT_VOUCHER_IMAGE,
-    points_required: voucher.points_required,
-    progress: {
-      current: user.total_points ?? 0,
-      target: voucher.points_required ?? 1,
-    },
-  }));
+  const vouchers = (db.vouchers ?? []).filter(
+    (voucher) => voucher.is_active ?? voucher.isActive
+  );
+  const userTotalPoints = user.total_points ?? user.totalPoints ?? 0;
+  const available = vouchers.map((voucher) => {
+    const pointsRequired = voucher.pointsRequired ?? voucher.points_required ?? 0;
+    return {
+      id: voucher.id,
+      name: voucher.name,
+      description: voucher.description,
+      image: VOUCHER_IMAGES[voucher.id] ?? DEFAULT_VOUCHER_IMAGE,
+      banner: VOUCHER_IMAGES[voucher.id] ?? DEFAULT_VOUCHER_IMAGE,
+      pointsRequired,
+      discountValue: voucher.discountValue ?? voucher.discount_value,
+      stock: voucher.stock,
+      validFrom: voucher.validFrom ?? voucher.valid_from,
+      validUntil: voucher.validUntil ?? voucher.valid_until,
+      isActive: voucher.isActive ?? voucher.is_active ?? true,
+      progress: {
+        current: userTotalPoints,
+        target: pointsRequired || 1,
+      },
+    };
+  });
 
   const voucherMap = new Map(vouchers.map((voucher) => [voucher.id, voucher]));
   const history = (db.voucher_redemptions ?? [])
@@ -307,8 +374,8 @@ function buildRewardsSummary(db, user) {
         id: entry.id,
         name: voucher?.name ?? "Voucher",
         image: VOUCHER_IMAGES[voucher?.id] ?? DEFAULT_VOUCHER_IMAGE,
-        redeemed_at: entry.redeemed_at?.split("T")[0] ?? entry.redeemed_at,
-        points: entry.points_deducted ?? 0,
+        redeemedAt: entry.redeemed_at?.split("T")[0] ?? entry.redeemed_at,
+        points: entry.points_deducted ?? entry.pointsDeducted ?? 0,
       };
     });
 
@@ -323,14 +390,14 @@ export function buildProfileSummary(db) {
     user: {
       id: user.id,
       name: user.username ?? user.email ?? "Teman Herbit",
-      photo_url: resolvePhotoUrl(user),
-      total_points: user.total_points ?? 0,
+      photoUrl: resolvePhotoUrl(user),
+      totalPoints: user.total_points ?? user.totalPoints ?? 0,
     },
     tabs: [
       { id: "activities", label: "Aktivitas" },
       { id: "rewards", label: "Rewards" },
     ],
-    activity_filters: [
+    activityFilters: [
       { id: "all", label: "Semua" },
       { id: "week", label: "Minggu ini", active: true },
       { id: "month", label: "Bulan ini" },

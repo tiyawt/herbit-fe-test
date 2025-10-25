@@ -13,7 +13,7 @@ export default function ProfilePage() {
   const { summary, loading, error } = useProfileSummary();
 
   const tabs = summary?.tabs ?? [];
-  const filters = summary?.activity_filters ?? [];
+  const filters = summary?.activityFilters ?? [];
   const defaultTab = tabs[0]?.id ?? "activities";
   const defaultFilter =
     filters.find((f) => f.active)?.id ?? filters[0]?.id ?? "all";

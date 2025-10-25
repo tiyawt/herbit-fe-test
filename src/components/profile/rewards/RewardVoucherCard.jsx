@@ -10,9 +10,15 @@ export default function RewardVoucherCard({ voucher, onRedeem, index = 0 }) {
   if (!voucher) return null;
 
   const current = clampNumber(voucher.progress?.current ?? 0, 0, Infinity);
-  const target = voucher.progress?.target ?? voucher.points_required ?? 1;
+  const target =
+    voucher.progress?.target ??
+    voucher.pointsRequired ??
+    voucher.points_required ??
+    1;
   const percent = clampNumber((current / target) * 100);
-  const canRedeem = current >= (voucher.points_required ?? target);
+  const requiredPoints =
+    voucher.pointsRequired ?? voucher.points_required ?? target;
+  const canRedeem = current >= requiredPoints;
   const borderColor = BORDER_COLORS[index % BORDER_COLORS.length];
   const dotColor = DOT_COLORS[index % DOT_COLORS.length];
   const progressLabel = `${current}/${target}`;

@@ -52,6 +52,7 @@ function PencilIcon({ size = 14, color = "#6B7280" }) {
 export default function ProfileHeader({ user, onEdit, onSettings }) {
   const displayName = user?.name ?? "Teman Herbit";
   const avatar = (() => {
+    if (user?.photoUrl) return user.photoUrl;
     if (user?.photo_url) return user.photo_url;
     const source = user?.name ?? user?.username ?? user?.email ?? "Teman Herbit";
     const cleaned = source.replace(/[^a-zA-Z\s]/g, " ").trim();
@@ -71,7 +72,9 @@ export default function ProfileHeader({ user, onEdit, onSettings }) {
     return `https://ui-avatars.com/api/?${params.toString()}`;
   })();
   const points =
-    typeof user?.total_points === "number"
+    typeof user?.totalPoints === "number"
+      ? user.totalPoints
+      : typeof user?.total_points === "number"
       ? user.total_points
       : user?.points ?? 0;
 

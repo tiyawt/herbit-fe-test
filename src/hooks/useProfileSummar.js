@@ -7,7 +7,7 @@ import apiClient from "@/lib/apiClient";
 const DEFAULT_SUMMARY = {
   user: null,
   tabs: [],
-  activity_filters: [],
+  activityFilters: [],
   activities: [],
 };
 
@@ -26,7 +26,15 @@ export default function useProfileSummary() {
         });
 
         if (active) {
-          setSummary({ ...DEFAULT_SUMMARY, ...response.data });
+          const data = response.data ?? {};
+          setSummary({
+            ...DEFAULT_SUMMARY,
+            ...data,
+            activityFilters:
+              data.activityFilters ??
+              data.activity_filters ??
+              DEFAULT_SUMMARY.activityFilters,
+          });
         }
       } catch (err) {
         if (!active) return;
