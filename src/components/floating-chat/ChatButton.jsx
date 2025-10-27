@@ -1,21 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import {
-    Accordion,
-    AccordionItem,
-    AccordionTrigger,
-    AccordionContent,
-} from "@/components/ui/accordion";
-import { 
-    MessageCircle, X, Search, CheckSquare, Droplet, Grid, ChevronLeft, Send 
-} from "lucide-react"; 
+import {Accordion,AccordionItem,AccordionTrigger,AccordionContent,} from "@/components/ui/accordion";
+import { X, Search, CheckSquare, Droplet, Grid, ChevronLeft, Send } from "lucide-react"; 
 import { ChevronRight } from 'lucide-react';
 import { cn } from "@/lib/utils"; 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-// --- DATA ---
 const faqData = {
     "Habit Tracker": [
        {
@@ -307,10 +299,8 @@ const getFaqIcon = (category) => {
     }
 }
 
-
 // --- SUB-COMPONENT 1: Tampilan Chat AI ---
 function ChatView({ setView, handleClose }) {
-    // State untuk input dan pesan (simulasi)
     const [messages, setMessages] = useState([
         { id: 1, text: "Halo, saya ada pertanyaan tentang Eco Enzyme!", sender: 'user' },
         { id: 2, text: "Tentu! Senang membantu. Silakan sampaikan pertanyaan Anda.", sender: 'ai' },
@@ -354,11 +344,9 @@ function ChatView({ setView, handleClose }) {
         }
     };
 
-    // Auto-scroll ke pesan terbaru
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
-
 
     return (
         <div className="flex flex-col h-full bg-white">
@@ -380,7 +368,6 @@ function ChatView({ setView, handleClose }) {
                     <div key={msg.id} className={cn("flex", { "justify-end": msg.sender === 'user', "justify-start": msg.sender === 'ai' })}>
                         <div className={cn("p-3 rounded-xl max-w-[80%] text-sm", {
         "bg-purple-600 text-white rounded-br-none": msg.sender === 'user',
-        // Tambahkan 'prose-sm' di sini:
         "bg-gray-100 text-gray-800 rounded-tl-none prose prose-sm max-w-none whitespace-pre-wrap": msg.sender === 'ai',
     })}>
                             {msg.sender === 'ai' ? (
@@ -388,34 +375,25 @@ function ChatView({ setView, handleClose }) {
                 {msg.text}
             </ReactMarkdown>
         ) : (
-            // Untuk pesan pengguna, tampilkan teks biasa
             msg.text 
         )}
                         </div>
                     </div>
                 ))}
-                {/* Loader saat menunggu respons */}
                {isLoading && (
     <div className="flex justify-start">
         <div className="bg-gray-100 text-gray-500 p-3 rounded-xl rounded-tl-none max-w-[80%] text-sm italic relative pr-8">
-            {/* Mengganti teks dengan animasi titik-titik */}
             AI sedang mengetik
             <span 
                 className="absolute right-3 bottom-3 text-lg font-bold" 
-                // Jika Anda tidak bisa menggunakan CSS @keyframes, ini adalah cara paling sederhana:
-                // Namun, untuk tampilan terbaik, gunakan @keyframes di CSS global Anda.
             >
                 ...
             </span>
-            {/* Jika Anda menggunakan tailwindcss-animate, Anda bisa pakai: */}
-            {/* <div className="typing-dots absolute right-3 bottom-3"></div> */}
         </div>
     </div>
 )}
 <div ref={chatEndRef} />
 </div>
-
-            {/* Input Chat */}
             <div className="p-3 border-t bg-white flex items-center">
                 <input
                     type="text"
@@ -437,11 +415,9 @@ function ChatView({ setView, handleClose }) {
         </div>
     );
 }
-
 // --- SUB-COMPONENT 2: Tampilan Detail FAQ Kategori ---
 function FaqDetailView({ setView, category, handleClose }) {
     const items = faqData[category] || [];
-
     return (
         <div className="flex flex-col h-full bg-white">
             <div className="flex items-center p-3 border-b bg-amber-400">
@@ -456,7 +432,6 @@ function FaqDetailView({ setView, category, handleClose }) {
                     <X className="w-5 h-5" />
                 </button>
             </div>
-            
             <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-white">
                 <Accordion type="single" collapsible className="w-full">
                     {items.map(({ question, answer }) => (
@@ -474,7 +449,6 @@ function FaqDetailView({ setView, category, handleClose }) {
         </div>
     );
 }
-
 // --- SUB-COMPONENT 3: Tampilan Utama (FAQ Kategori) ---
 function MainView({ setView, setSelectedCategory, handleClose }) {
     return (
@@ -492,7 +466,6 @@ function MainView({ setView, setSelectedCategory, handleClose }) {
                     <X className="w-5 h-5" />
                 </button>
             </div>
-
             {/* Konten Utama Chatbot (di-scroll) */}
             <div className="overflow-y-auto px-4 py-4 space-y-6 flex-1">
                 {/* Chat Section Link */}
@@ -500,7 +473,6 @@ function MainView({ setView, setSelectedCategory, handleClose }) {
                     <h3 className="font-bold text-lg text-gray-900 mb-2">Sampaikan pertanyaan Anda!</h3>
                     <button 
                         onClick={() => setView('chat')} 
-                        // Efek Hover Interaktif yang lebih jelas
                         className="w-full text-left flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 transition duration-150 shadow-inner hover:shadow-lg"
                     >
                         <div className="w-8 h-8 flex items-center justify-center text-purple-600">
@@ -513,14 +485,12 @@ function MainView({ setView, setSelectedCategory, handleClose }) {
                         <ChevronRight className="w-5 h-5 text-gray-400 ml-auto" />
                     </button>
                 </div>
-
                 {/* FAQ Kategori */}
               <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 shadow-sm">
                     <div className="flex justify-between items-center pb-2 border-b border-gray-200">
                         <h3 className="font-bold text-lg text-gray-900">FAQ Berdasarkan Kategori</h3>
                         <Search className="w-5 h-5 text-gray-400" />
-                    </div>
-                    
+                    </div>             
                     <div className="space-y-3">
                         {Object.keys(faqData).map((category) => (
                             <button
@@ -529,7 +499,6 @@ function MainView({ setView, setSelectedCategory, handleClose }) {
                                     setSelectedCategory(category);
                                     setView('faq_detail');
                                 }}
-                                // Efek Hover Interaktif (Shadow dan Scale ringan)
                                 className="w-full text-left flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:translate-x-1 hover:border-purple-300 transition duration-150"
                             >
                                 <div className="flex items-center font-semibold text-gray-800">
@@ -545,9 +514,8 @@ function MainView({ setView, setSelectedCategory, handleClose }) {
         </div>
     );
 }
-
 // --- MAIN COMPONENT: ChatbotButton ---
-export default function ChatbotButton() {
+export default function ChatButton() {
     // view state: 'main' | 'chat' | 'faq_detail'
     const [isOpen, setIsOpen] = useState(false);
     const [view, setView] = useState('main'); 
@@ -558,13 +526,11 @@ export default function ChatbotButton() {
         setIsOpen(true);
         setIsClosing(false);
     };
-
     const handleClose = () => {
         setIsClosing(true);
-        // Biarkan animasi transisi (300ms) berjalan sebelum menghilangkan modal
         setTimeout(() => {
             setIsOpen(false);
-            setView('main'); // Reset tampilan ke Main setelah modal tertutup
+            setView('main'); 
             setIsClosing(false);
         }, 300); 
     };
@@ -581,36 +547,30 @@ export default function ChatbotButton() {
         }
     }
 
-    // Class untuk animasi transisi modal
     const modalClasses = cn(
         "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
        "w-[90vw] max-w-lg lg:max-w-3xl h-[90vh] max-h-[700px] bg-white border rounded-2xl shadow-2xl",
         "flex flex-col z-[9999] overflow-hidden transition-all duration-300 ease-in-out",
         {
-            // State saat terbuka
             "opacity-100 scale-100": isOpen && !isClosing, 
-            // Animasi Keluar: Scale 100 -> 90, Fade 100 -> 0
-            "opacity-0 scale-90 pointer-events-none": !isOpen || isClosing, // Ubah scale-95 menjadi scale-90
+            "opacity-0 scale-90 pointer-events-none": !isOpen || isClosing, 
         }
     );
 
     return (
         <>
             <button
-                // Peningkatan Hover: scale-110 untuk efek "bounce" kecil
-                className="fixed bottom-8 right-8 bg-purple-600 text-white p-5 rounded-full shadow-2xl z-[9999] hover:bg-purple-700 hover:scale-110 transition-all duration-300 ease-in-out"
+                className="justify-center items-center flex fixed bottom-35 right-15 bg-purple-600 text-white p-6 rounded-full shadow-2xl z-[9999] hover:bg-purple-700 hover:scale-110 transition-all duration-300 ease-in-out"
                 onClick={() => (isOpen ? handleClose() : handleOpen())}
                 aria-label={isOpen ? "Tutup Chat" : "Buka Chat"}
             >
-                {/* Menggunakan Ikon Bot saat tertutup (Mengganti MessageCircle) */}
                 {isOpen ? <X className="w-6 h-6" /> : (
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
                 )}
+                <span className="ml-1">Chat AI</span>
             </button>
-            {/* Modal/Widget */}
             {isOpen && (
                 <>
-                    {/* Overlay (Latar Belakang Gelap) */}
                    <div 
                         className={cn(
                             "fixed inset-0 bg-black/30 backdrop-blur-sm z-[9998] transition-opacity duration-300",
@@ -621,8 +581,6 @@ export default function ChatbotButton() {
                         )}
                         onClick={handleClose}
                     />
-
-                    {/* Chatbot Container dengan Animasi Zoom/Fade */}
                     <div className={modalClasses}>
                         {renderView()}
                     </div>
