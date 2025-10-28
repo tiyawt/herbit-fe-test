@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import kitchen from "@/assets/kitchen.jpg";
-import trashData from "@/data/trash";
+import trashData from "@/data/trash.js"
 import { List, Share2 } from "lucide-react";
 import CongratsModal from "./CongratsModal";
 
@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { GAME_KEY, ITEM_H_REM, FLOOR_CLEAR_REM } from "@/constants/game";
+import { GAME_KEY, ITEM_H_REM, FLOOR_CLEAR_REM } from "@/constants/game"
 import { ymd } from "@/lib/date";
 import { safeLoad, safeSave } from "@/lib/storage";
 import { rngFromSeed } from "@/lib/random";
@@ -24,7 +24,7 @@ import useDailyStreak from "@/hooks/useDailyStreak";
 import useFunFact from "@/hooks/useFunFact";
 import useSharePayload from "@/hooks/useSharePayload";
 
-import Trash from "./Trash";
+import Trash from "@/components/game/Trash";
 import Bin from "./Bin";
 import ShareSheet from "./ShareSheet";
 import HintsOverlay from "./HintsOverlay";

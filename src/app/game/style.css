@@ -1,0 +1,196 @@
+.pixel-btn {
+  --p-bg: #e5e7eb;
+  /* default gray bg */
+  --p-light: #f3f4f6;
+  /* highlight */
+  --p-dark: #9ca3af;
+  /* inner shadow */
+  --p-border: #374151;
+  /* outer border */
+  position: relative;
+  padding: 0.9rem 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--p-bg);
+  border: 4px solid var(--p-border);
+  box-shadow:
+    inset 0 4px 0 var(--p-light),
+    inset 0 -6px 0 var(--p-dark),
+    0 6px 0 var(--p-border);
+  transform: translateY(0);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  image-rendering: pixelated;
+}
+
+.pixel-bg {
+  --p-bg: #82c590;
+  /* warna dasar */
+  --p-light: #a8d8b3;
+  /* lebih terang untuk highlight */
+  --p-dark: #5ca373;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #3d6b4d;
+  /* outer border */
+  position: relative;
+  padding: 0.9rem 6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--p-bg);
+  border: 4px solid var(--p-border);
+  border-radius: 1rem;
+  box-shadow:
+    inset 0 4px 0 var(--p-light),
+    inset 0 -6px 0 var(--p-dark),
+    0 6px 0 var(--p-border);
+  image-rendering: pixelated;
+}
+
+.pixel-background {
+  --p-bg: #82c590;
+  /* warna dasar */
+  --p-light: #a8d8b3;
+  /* lebih terang untuk highlight */
+  --p-dark: #5ca373;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #3d6b4d;
+  position: relative;
+  padding: 0.9rem 2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--p-bg);
+  border: 4px solid var(--p-border);
+  border-radius: 1rem;
+  box-shadow:
+    inset 0 4px 0 var(--p-light),
+    inset 0 -6px 0 var(--p-dark),
+    0 6px 0 var(--p-border);
+  image-rendering: pixelated;
+}
+
+.pixel-btn.blue, .pixel-background.blue {
+  --p-bg: #3B82F6;
+  /* biru utama (Tailwind blue-500) */
+  --p-light: #60A5FA;
+  /* lebih terang untuk highlight */
+  --p-dark: #1D4ED8;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #1E3A8A;
+  /* border biru tua */
+}
+
+
+.pixel-btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 4px 0 var(--p-light),
+    inset 0 -2px 0 var(--p-dark),
+    0 2px 0 var(--p-border);
+}
+
+/* color themes */
+.pixel-btn.yellow {
+  --p-bg: #facc15;
+  --p-light: #fde047;
+  --p-dark: #ca8a04;
+  --p-border: #713f12;
+}
+
+.pixel-btn.neutral {
+  --p-bg: #dad2d1;
+  /* warna dasar */
+  --p-light: #eee8e7;
+  /* lebih terang untuk highlight */
+  --p-dark: #b8afae;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #7b7271;
+  /* paling gelap untuk border */
+}
+
+.pixel-btn.green,
+.pixel-background.green {
+  --p-bg: #25D366;
+  /* hijau utama ala WhatsApp */
+  --p-light: #5BE58F;
+  /* lebih terang untuk highlight */
+  --p-dark: #1BA955;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #128C7E;
+  /* warna border lebih pekat, mirip WhatsApp dark green */
+}
+
+.pixel-btn.red {
+  --p-bg: #EF4444;
+  /* merah utama (mirip Tailwind red-500) */
+  --p-light: #F87171;
+  /* lebih terang untuk highlight */
+  --p-dark: #B91C1C;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #7F1D1D;
+  /* border merah tua */
+}
+
+
+.pixel-btn.black {
+  --p-bg: #111111;
+  /* warna dasar, hitam pekat */
+  --p-light: #333333;
+  /* highlight, sedikit lebih terang */
+  --p-dark: #000000;
+  /* inner shadow, benar-benar gelap */
+  --p-border: #444444;
+  /* border, supaya masih kelihatan tepiannya */
+}
+
+
+.pixel-btn.rose {
+  --p-bg: #977275;
+  /* warna dasar */
+  --p-light: #b48d91;
+  /* lebih terang untuk highlight */
+  --p-dark: #7b5d60;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #5c4042;
+  /* paling gelap untuk border */
+}
+
+.pixel-btn.mint {
+  --p-bg: #82c590;
+  /* warna dasar */
+  --p-light: #a8d8b3;
+  /* lebih terang untuk highlight */
+  --p-dark: #5ca373;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #3d6b4d;
+  /* paling gelap untuk border */
+}
+
+.pixel-btn.sky {
+  --p-bg: #a3c3da;
+  /* warna dasar */
+  --p-light: #c2d8e8;
+  /* lebih terang untuk highlight */
+  --p-dark: #7da2bd;
+  /* lebih gelap untuk inner shadow */
+  --p-border: #4f6c87;
+  /* paling gelap untuk border */
+}
+
+
+.pixel {
+  font-family: "Pixelify Sans", ui-monospace, monospace;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
+.cursor-target {
+  cursor: none;
+}
+
+@media (max-width: 640px) {
+  .pixel-bg {
+    padding: 0.9rem 1rem;
+  }
+}
