@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
 const DEFAULT_SUMMARY = {
@@ -11,51 +11,51 @@ const DEFAULT_SUMMARY = {
   habitsToday: [],
 };
 
-export function useHomeSummary(username) {
+export function useHomeSummary() {
   const [data, setData] = useState(DEFAULT_SUMMARY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchSummary = useCallback(async () => {
-    setLoading(true);
-    setData(DEFAULT_SUMMARY);
-    try {
-      const params = new URLSearchParams();
-      if (username) {
-        params.set("username", username);
-      }
-      const response = await axios.get(
-        `/api/summary/home${params.toString() ? `?${params.toString()}` : ""}`,
-        {
-          headers: { "Cache-Control": "no-cache" },
-        }
-      );
-      setData({ ...DEFAULT_SUMMARY, ...response.data });
-      setError(null);
-    } catch (err) {
-      const message = axios.isAxiosError(err)
-        ? err.response?.data?.error ?? err.message
-        : err instanceof Error
-        ? err.message
-        : "Unknown error";
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [username]);
-
   useEffect(() => {
+    let active = true;
+
+    async function fetchSummary() {
+      try {
+        const response = await axios.get("/api/summary/home", {
+          headers: { "Cache-Control": "no-cache" },
+        });
+
+        if (active) {
+          setData({ ...DEFAULT_SUMMARY, ...response.data });
+        }
+      } catch (err) {
+        if (!active) return;
+        const message = axios.isAxiosError(err)
+          ? err.response?.data?.error ?? err.message
+          : err instanceof Error
+          ? err.message
+          : "Unknown error";
+        setError(message);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
     fetchSummary();
-  }, [fetchSummary]);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const value = useMemo(
     () => ({
       summary: data,
       loading,
       error,
-      refetch: fetchSummary,
     }),
-    [data, loading, error, fetchSummary]
+    [data, loading, error]
   );
 
   return value;

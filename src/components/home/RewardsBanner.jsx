@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const AUTOPLAY_INTERVAL = 6000;
 
-export default function RewardsBanner({ items = [], loading = false }) {
+export default function RewardsBanner({ items = [] }) {
   const banners = useMemo(() => {
     if (!Array.isArray(items)) {
       return [];
@@ -17,7 +17,7 @@ export default function RewardsBanner({ items = [], loading = false }) {
   const hasMultiple = banners.length > 1;
 
   useEffect(() => {
-    if (loading || !hasMultiple) {
+    if (!hasMultiple) {
       return;
     }
 
@@ -26,22 +26,13 @@ export default function RewardsBanner({ items = [], loading = false }) {
     }, AUTOPLAY_INTERVAL);
 
     return () => window.clearInterval(id);
-  }, [banners.length, hasMultiple, loading]);
+  }, [banners.length, hasMultiple]);
 
   useEffect(() => {
-    if (loading) {
-      return;
-    }
     if (activeIndex >= banners.length) {
       setActiveIndex(0);
     }
-  }, [banners.length, activeIndex, loading]);
-
-  if (loading) {
-    return (
-      <div className="h-[92px] w-full rounded-2xl border border-white/40 bg-white/60 shadow-sm animate-pulse" />
-    );
-  }
+  }, [banners.length, activeIndex]);
 
   if (banners.length === 0) {
     return null;

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MaskIcon from "@/components/ui/MaskIcon";
-import { useEffect, useMemo, useState } from "react";
 
 export default function BottomNav({
   tabs,
@@ -12,70 +11,11 @@ export default function BottomNav({
   className = "",
 }) {
   const pathname = usePathname();
-  const initialProfileHref = useMemo(() => {
-    if (!pathname) return null;
-    const match = pathname.match(/^\/([^/]+)\/(aktivitas|rewards)/i);
-    return match ? `/${match[1]}/aktivitas` : null;
-  }, [pathname]);
-  const [profileHref, setProfileHref] = useState(initialProfileHref);
 
-  useEffect(() => {
-    if (initialProfileHref) {
-      setProfileHref(initialProfileHref);
-    }
-  }, [initialProfileHref]);
-
-  useEffect(() => {
-    if (profileHref) return undefined;
-    let cancelled = false;
-    async function loadProfileHref() {
-      try {
-        const response = await fetch("/api/profile/summary", {
-          cache: "no-store",
-          headers: { "Cache-Control": "no-cache" },
-        });
-        if (!response.ok) return;
-        const data = await response.json();
-        const username =
-          data?.user?.username || data?.user?.email || data?.user?.name;
-        if (!cancelled && username) {
-          setProfileHref(`/${username}/aktivitas`);
-        }
-      } catch (error) {
-        // ignore
-      }
-    }
-    loadProfileHref();
-    return () => {
-      cancelled = true;
-    };
-  }, [profileHref]);
-
-  const isActive = ({ href, matchPrefix = true, matchPattern }) => {
-    if (matchPattern && pathname) {
-      const pattern =
-        typeof matchPattern === "string"
-          ? new RegExp(matchPattern, "i")
-          : matchPattern;
-      return pattern.test(pathname);
-    }
+  const isActive = (href, matchPrefix = true) => {
     if (href === "/") return pathname === "/";
     return matchPrefix ? pathname?.startsWith(href) : pathname === href;
   };
-
-  const resolvedTabs = useMemo(
-    () =>
-      tabs.map((tab) =>
-        tab.key === "profile"
-          ? {
-              ...tab,
-              href: profileHref ?? tab.href ?? "/",
-              matchPrefix: false,
-            }
-          : tab
-      ),
-    [tabs, profileHref]
-  );
 
   return (
     <nav
@@ -124,39 +64,37 @@ export default function BottomNav({
         />
 
         <ul className="relative z-10 flex w-full items-center justify-between">
-          {resolvedTabs.map(
-            ({ key, href, label, icon, matchPrefix = true, matchPattern }) => {
-              const active = isActive({ href, matchPrefix, matchPattern });
-              return (
-                <li key={key} className="flex flex-col items-center gap-1">
-                  <Link
-                    href={href}
-                    aria-label={label}
-                    aria-current={active ? "page" : undefined}
-                    className="
-                      flex flex-col items-center gap-1
-                      transition-transform duration-200 ease-out hover:scale-[1.05]
-                    "
-                    style={{ transform: active ? "scale(1.06)" : "scale(1)" }}
+          {tabs.map(({ key, href, label, icon, matchPrefix = true }) => {
+            const active = isActive(href, matchPrefix);
+            return (
+              <li key={key} className="flex flex-col items-center gap-1">
+                <Link
+                  href={href}
+                  aria-label={label}
+                  aria-current={active ? "page" : undefined}
+                  className="
+                    flex flex-col items-center gap-1
+                    transition-transform duration-200 ease-out hover:scale-[1.05]
+                  "
+                  style={{ transform: active ? "scale(1.06)" : "scale(1)" }}
+                >
+                  <MaskIcon
+                    name={icon}
+                    size={24}
+                    color={active ? activeColor : inactiveColor}
+                  />
+                  <span
+                    className={`text-[12px] leading-none ${
+                      active ? "font-medium" : ""
+                    }`}
+                    style={{ color: active ? activeColor : inactiveColor }}
                   >
-                    <MaskIcon
-                      name={icon}
-                      size={24}
-                      color={active ? activeColor : inactiveColor}
-                    />
-                    <span
-                      className={`text-[12px] leading-none ${
-                        active ? "font-medium" : ""
-                      }`}
-                      style={{ color: active ? activeColor : inactiveColor }}
-                    >
-                      {label}
-                    </span>
-                  </Link>
-                </li>
-              );
-            }
-          )}
+                    {label}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </nav>
