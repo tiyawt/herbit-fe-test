@@ -299,7 +299,6 @@ const getFaqIcon = (category) => {
     }
 }
 
-// --- SUB-COMPONENT 1: Tampilan Chat AI ---
 function ChatView({ setView, handleClose }) {
     const [messages, setMessages] = useState([
         { id: 1, text: "Halo, saya ada pertanyaan tentang Eco Enzyme!", sender: 'user' },
@@ -318,7 +317,6 @@ function ChatView({ setView, handleClose }) {
         setInput('');
         setIsLoading(true);
 
-        // --- PENGGANTIAN OLLAMA/GEMINI LOGIC DI SINI ---
         try {
             // Memanggil API Route Next.js yang sudah dikonfigurasi untuk Gemini
             const response = await fetch('/api/chat', {
@@ -385,8 +383,7 @@ function ChatView({ setView, handleClose }) {
         <div className="bg-gray-100 text-gray-500 p-3 rounded-xl rounded-tl-none max-w-[80%] text-sm italic relative pr-8">
             AI sedang mengetik
             <span 
-                className="absolute right-3 bottom-3 text-lg font-bold" 
-            >
+                className="absolute right-3 bottom-3 text-lg font-bold" >
                 ...
             </span>
         </div>
@@ -402,20 +399,17 @@ function ChatView({ setView, handleClose }) {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                     disabled={isLoading}
-                    className="flex-1 border border-gray-300 p-2.5 rounded-full mr-2 text-sm focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
-                />
+                    className="flex-1 border border-gray-300 p-2.5 rounded-full mr-2 text-sm focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"/>
                 <button 
                     onClick={handleSend} 
                     disabled={!input.trim() || isLoading}
-                    className="bg-purple-600 text-white p-2.5 rounded-full hover:bg-purple-700 disabled:bg-gray-400 transition"
-                >
+                    className="bg-purple-600 text-white p-2.5 rounded-full hover:bg-purple-700 disabled:bg-gray-400 transition" >
                     <Send className="w-5 h-5" />
                 </button>
             </div>
         </div>
     );
 }
-// --- SUB-COMPONENT 2: Tampilan Detail FAQ Kategori ---
 function FaqDetailView({ setView, category, handleClose }) {
     const items = faqData[category] || [];
     return (
@@ -449,11 +443,9 @@ function FaqDetailView({ setView, category, handleClose }) {
         </div>
     );
 }
-// --- SUB-COMPONENT 3: Tampilan Utama (FAQ Kategori) ---
 function MainView({ setView, setSelectedCategory, handleClose }) {
     return (
         <div className="flex flex-col h-full bg-white">
-            {/* Header Utama */}
             <div className="flex justify-between items-start p-4 bg-amber-400 ">
                 <div>
                     <h2 className="text-xl font-extrabold text-gray-900">Halo!</h2>
@@ -466,15 +458,12 @@ function MainView({ setView, setSelectedCategory, handleClose }) {
                     <X className="w-5 h-5" />
                 </button>
             </div>
-            {/* Konten Utama Chatbot (di-scroll) */}
             <div className="overflow-y-auto px-4 py-4 space-y-6 flex-1">
-                {/* Chat Section Link */}
                 <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 shadow-sm">
                     <h3 className="font-bold text-lg text-gray-900 mb-2">Sampaikan pertanyaan Anda!</h3>
                     <button 
                         onClick={() => setView('chat')} 
-                        className="w-full text-left flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 transition duration-150 shadow-inner hover:shadow-lg"
-                    >
+                        className="w-full text-left flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 transition duration-150 shadow-inner hover:shadow-lg">
                         <div className="w-8 h-8 flex items-center justify-center text-purple-600">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
                         </div>
