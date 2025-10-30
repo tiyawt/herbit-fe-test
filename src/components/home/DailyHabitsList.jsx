@@ -38,8 +38,7 @@ export default function DailyHabitsList({
   const Container = scrollable ? "div" : "div";
   const containerProps = scrollable
     ? {
-        className:
-          "space-y-3 max-h-[260px] overflow-y-auto pr-1 pb-16 overscroll-contain",
+        className: "space-y-3 overflow-y-auto pr-1 overscroll-contain",
       }
     : { className: "space-y-3" };
 

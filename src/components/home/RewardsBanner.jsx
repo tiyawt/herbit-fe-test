@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const AUTOPLAY_INTERVAL = 6000;
+const AUTOPLAY_INTERVAL = 4000;
 
 export default function RewardsBanner({ items = [], loading = false }) {
   const banners = useMemo(() => {
@@ -69,8 +69,7 @@ export default function RewardsBanner({ items = [], loading = false }) {
             <a
               key={banner.id ?? `${banner.image}-${index}`}
               href={banner.href ?? "#"}
-              className="block w-full shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FEA800]"
-              style={{ width: `${100 / banners.length}%` }}
+              className="block w-full flex-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FEA800]"
             >
               <img
                 src={banner.image}
