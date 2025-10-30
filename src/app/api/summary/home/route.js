@@ -3,11 +3,7 @@ import apiClient from "@/lib/apiClient";
 
 export async function GET(request) {
   try {
-    const username = request.nextUrl.searchParams.get("username") ?? undefined;
-    const endpoint = username
-      ? `/users/${encodeURIComponent(username)}/home-summary`
-      : "/users/home-summary";
-
+    const endpoint = "/users/home-summary";
     const cookieHeader = request.headers.get("cookie") ?? undefined;
     const response = await apiClient.get(endpoint, {
       headers: {

@@ -104,9 +104,9 @@ export default function RewardsPanel({ rewards, loading, onRefresh, username }) 
         </h3>
         {available.length > 0 ? (
           <div className="space-y-3">
-            {available.map((voucher) => (
+            {available.map((voucher, index) => (
               <RewardVoucherCard
-                key={voucher.id}
+                key={voucher.id ?? voucher.slug ?? `available-${index}`}
                 voucher={voucher}
                 onRedeem={setSelectedVoucher}
               />

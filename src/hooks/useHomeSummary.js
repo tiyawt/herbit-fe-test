@@ -11,7 +11,7 @@ const DEFAULT_SUMMARY = {
   habitsToday: [],
 };
 
-export function useHomeSummary(username) {
+export function useHomeSummary() {
   const [data, setData] = useState(DEFAULT_SUMMARY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,16 +19,9 @@ export function useHomeSummary(username) {
   const fetchSummary = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (username) {
-        params.set("username", username);
-      }
-      const response = await axios.get(
-        `/api/summary/home${params.toString() ? `?${params.toString()}` : ""}`,
-        {
-          headers: { "Cache-Control": "no-cache" },
-        }
-      );
+      const response = await axios.get("/api/summary/home", {
+        headers: { "Cache-Control": "no-cache" },
+      });
       setData({ ...DEFAULT_SUMMARY, ...response.data });
       setError(null);
     } catch (err) {
@@ -51,7 +44,7 @@ export function useHomeSummary(username) {
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, []);
 
   useEffect(() => {
     fetchSummary();

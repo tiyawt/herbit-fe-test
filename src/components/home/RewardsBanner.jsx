@@ -67,7 +67,7 @@ export default function RewardsBanner({ items = [], loading = false }) {
         >
           {banners.map((banner, index) => (
             <a
-              key={banner.id ?? `${banner.image}-${index}`}
+              key={banner.id ?? banner.name ?? `reward-banner-${index}`}
               href={banner.href ?? "#"}
               className="block w-full flex-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FEA800]"
             >
