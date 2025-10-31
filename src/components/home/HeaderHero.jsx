@@ -194,12 +194,33 @@ export default function HeaderHero({ user }) {
 
   const displayName = user?.name ?? "Teman Herbit";
   const points =
-    typeof user?.total_points === "number"
+    typeof user?.totalPoints === "number"
+      ? user.totalPoints
+      : typeof user?.total_points === "number"
       ? user.total_points
       : typeof user?.points === "number"
       ? user.points
       : 0;
-  const avatar = user?.photo_url ?? user?.avatar ?? "/sample-avatar.png";
+  const avatar = (() => {
+    if (user?.photoUrl) return user.photoUrl;
+    if (user?.photo_url) return user.photo_url;
+    const source = user?.name ?? user?.username ?? user?.email ?? "Teman Herbit";
+    const cleaned = source.replace(/[^a-zA-Z\s]/g, " ").trim();
+    const initials = cleaned
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "T";
+    const params = new URLSearchParams({
+      name: initials,
+      background: "FACC15",
+      color: "ffffff",
+      size: "128",
+    });
+    return `https://ui-avatars.com/api/?${params.toString()}`;
+  })();
   const calendarPortal = isMounted
     ? createPortal(
         <div className="fixed inset-0 pointer-events-none z-[998]">
