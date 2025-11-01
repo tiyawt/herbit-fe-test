@@ -62,7 +62,7 @@ export default function RewardVoucherCard({ voucher, onRedeem }) {
 
         <div className="flex items-center gap-3 pt-1">
           <div className="relative flex-1">
-            <div className="h-[10px] w-full overflow-hidden rounded-full bg-[#FFE6BF]">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#FFE6BF]">
               <div
                 className="h-full rounded-full bg-[#FEA800] transition-all"
                 style={{ width: `${percent}%` }}

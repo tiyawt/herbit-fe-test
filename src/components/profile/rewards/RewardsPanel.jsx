@@ -346,7 +346,9 @@ function RewardsSkeleton() {
       </section>
 
       <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-900">Voucher tersedia</h3>
+        <h3 className="text-sm font-semibold text-gray-900">
+          Voucher tersedia
+        </h3>
         <div className="space-y-3">
           {Array.from({ length: 2 }).map((_, idx) => (
             <div
@@ -367,7 +369,7 @@ function RewardsSkeleton() {
                 <div className="mt-4 h-px w-full border-t border-dashed border-gray-200" />
                 <div className="flex items-center gap-3 pt-2">
                   <div className="relative flex-1">
-                    <div className="h-[10px] w-full overflow-hidden rounded-full bg-[#FFE6BF]">
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#FFE6BF]">
                       <div className="h-full w-1/2 rounded-full bg-[#FEA800] animate-pulse" />
                     </div>
                   </div>
