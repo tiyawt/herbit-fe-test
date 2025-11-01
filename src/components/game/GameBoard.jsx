@@ -96,23 +96,46 @@ export default function GameBoard() {
   };
   const refreshUser = useCallback(async () => {
     const me = await getMe();
-    setServerStreak(me.user.sortingStreak ?? 0);
-    setTotalPoints(me.user.totalPoints ?? 0);
+    console.log("🔄 Refresh user:", me);
+    setServerStreak(me.sortingStreak ?? 0);
+    setTotalPoints(me.totalPoints ?? 0);
   }, []);
 
   useEffect(() => {
     (async () => {
       try {
-        const { data: startRes } = await apiClient.post("/game/start");
-        await refreshUser();
-        setSessionId(startRes.session._id);
+        console.log("🎮 Initializing game...");
 
-        const me = await getMe();
-        setServerStreak(me.user.sortingStreak || 0);
-        setTotalPoints(me.user.totalPoints || 0);
-        console.log("[INIT me]", me.user);
+        // 1) Ambil user
+        const me = await getMe(); 
+        const u = me ?? {}; 
+
+        console.log("👤 User data:", u);
+
+        setServerStreak(u.sortingStreak ?? 0);
+        setTotalPoints(u.totalPoints ?? 0); 
+        console.log("📊 Init totalPoints:", u.totalPoints);
+
+        // 2) Start session
+        const { data: startRes } = await apiClient.post("/game/start");
+        const sid = startRes.session._id;
+        const bucket = startRes.session.dayBucket;
+        setSessionId(sid);
+
+        // 3) Cek reward status
+        try {
+          const { data: rewardCheck } = await apiClient.get(
+            `/game/reward-status/${bucket}`
+          );
+          setAlreadyClaimed(!!rewardCheck.alreadyClaimed);
+          console.log("🏆 Reward status:", rewardCheck);
+        } catch {
+          console.log("ℹ️ No reward claimed yet");
+          setAlreadyClaimed(false);
+        }
+        console.log("✅ Game initialized successfully");
       } catch (err) {
-        console.error("Error init game:", err);
+        console.error("❌ Error init game:", err);
       }
     })();
   }, []);
@@ -149,19 +172,18 @@ export default function GameBoard() {
       playOk();
       setTrash((prev) => {
         const next = prev.filter((t) => t.id !== active.id);
-
-        // semua item habis → panggil COMPLETE
         if (next.length === 0 && sessionId) {
           fetchFunFact();
 
           apiClient
             .post(`/game/complete/${sessionId}`)
             .then(({ data }) => {
-              // entitlement buat ditampilin di modal
               setEntitledPoint(data.reward?.entitledPoint || 0);
+
               const user = data.user || {};
               setServerStreak(user.sortingStreak ?? 0);
               setTotalPoints(user.totalPoints ?? 0);
+              setAlreadyClaimed(data.reward?.alreadyClaimed || false);
 
               setOpenCongrats(true);
             })
@@ -172,7 +194,7 @@ export default function GameBoard() {
       });
     } else {
       playMiss();
-      setWrongCount((w) => w + 1); // optional; boleh hapus kalau ga dipakai
+      setWrongCount((w) => w + 1);
       setShakeBin(target);
       setShakeItemId(active.id);
       setTimeout(() => {
@@ -185,16 +207,25 @@ export default function GameBoard() {
   async function handleClaim() {
     if (!sessionId) return;
     try {
+      console.log("🎯 Claiming reward for session:", sessionId);
+
       const { data } = await apiClient.post(`/game/claim/${sessionId}`);
+      console.log("📦 Claim response:", data);
+
       const user = data.user || {};
       setTotalPoints(user.totalPoints ?? 0);
       setServerStreak(user.sortingStreak ?? 0);
-      setAlreadyClaimed(data.alreadyClaimed);
+      setAlreadyClaimed(true);
+      await refreshUser();
+
+      console.log("Claim success! New total points:", user.totalPoints);
+
+      return data;
     } catch (err) {
-      console.error("Claim error:", err);
+      console.error("❌ Claim error:", err);
+      throw err;
     }
   }
-
   const resetAll = () => {
     const d = ymd();
     const nextSalt = resetSalt + 1;
@@ -342,24 +373,35 @@ export default function GameBoard() {
       />
 
       {openCongrats && (
-        <CongratsModal
-          sessionId={sessionId}
-          streak={serverStreak}
-          factData={factData}
-          loading={loading}
-          onClaim={handleClaim}
-          onClose={() => setOpenCongrats(false)}
-          onShare={handleOpenShareFromCongrats}
-          onNext={() => {
-            setOpenCongrats(false);
-            const d = ymd();
-            const nextSalt = resetSalt + 1;
-            const init = initRandomTrash(makeSeed(d, nextSalt));
-            setTrash(init);
-            setResetSalt(nextSalt);
-            safeSave(GAME_KEY, { day: d, trash: init, resetSalt: nextSalt });
-          }}
-        />
+        <>
+          {console.log("Opening modal with:", {
+            alreadyClaimed,
+            entitledPoint,
+            totalPoints,
+            sessionId,
+          })}
+          <CongratsModal
+            sessionId={sessionId}
+            streak={serverStreak}
+            factData={factData}
+            loading={loading}
+            onClaim={handleClaim}
+            onClose={() => setOpenCongrats(false)}
+            onShare={handleOpenShareFromCongrats}
+            alreadyClaimed={alreadyClaimed}
+            claimPoints={entitledPoint || 10}
+            currentPoints={totalPoints} 
+            onNext={() => {
+              setOpenCongrats(false);
+              const d = ymd();
+              const nextSalt = resetSalt + 1;
+              const init = initRandomTrash(makeSeed(d, nextSalt));
+              setTrash(init);
+              setResetSalt(nextSalt);
+              safeSave(GAME_KEY, { day: d, trash: init, resetSalt: nextSalt });
+            }}
+          />
+        </>
       )}
     </div>
   );
