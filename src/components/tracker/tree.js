@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +8,8 @@ import { getLeaves, getFruits, claimFruit, getMe } from "@/lib/taskTracker";
 import { leafPositions } from "./leaf-positios";
 import FruitProgress from "./fruitProgress";
 import SaveYellowLeaves from "./saveYellowLeaves";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Tree() {
   const [leaves, setLeaves] = useState([]);
@@ -105,7 +108,9 @@ export default function Tree() {
   return (
     <main className="flex flex-col font-sans mx-4 mb-12">
       {/* Header poin */}
-      <div>
+    <div className=" flex items-center justify-between flex-wrap gap-2">
+      {/* 🏅 Poin di kiri */}
+      <div className="flex items-center">
         <span className="text-[#FEA800] font-semibold text-sm">
           🏅 {points} Points
         </span>
@@ -126,8 +131,17 @@ export default function Tree() {
         </AnimatePresence>
       </div>
 
+        <Link href="/app/(features)/${username}/rewards">
+          <Button className="bg-violet-600 hover:bg-violet-700 text-white font-semibold flex items-center shadow-md transition-transform duration-150 active:scale-95 w-full sm:w-auto">
+            Rewards and Vouchers
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
+      
+    </div>
+
       {/* Judul */}
-      <div className="text-center">
+      <div className="text-center mt-2">
         <p className="text-base text-amber-700 font-medium mt-1">
           Panen Buah dan Dapatkan Poin!
         </p>
