@@ -175,7 +175,7 @@ export default function PhotoClient({ user }) {
     <main className="min-h-screen bg-white text-[#0A0A19]">
       <form className="flex min-h-screen flex-col" onSubmit={handleSubmit}>
         <header
-          className="px-4 border-b border-gray-200"
+          className="px-4  border-gray-200"
           style={{ paddingTop: "calc(24px + env(safe-area-inset-top))" }}
         >
           <div className="flex min-h-12 items-center justify-between">

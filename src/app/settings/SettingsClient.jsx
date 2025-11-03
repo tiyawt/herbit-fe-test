@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import getFallbackAvatar from "@/lib/avatarFallback";
+import { API_BASE_URL } from "@/lib/absoluteUrl";
 
 function ChevronRightIcon({ size = 16, color = "#9CA3AF" }) {
   return (
@@ -28,6 +29,9 @@ function ChevronRightIcon({ size = 16, color = "#9CA3AF" }) {
 export default function SettingsClient({ profile }) {
   const router = useRouter();
 
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
+
   const username = profile?.username ?? "";
   const email = profile?.email ?? "";
 
@@ -51,6 +55,36 @@ export default function SettingsClient({ profile }) {
     if (profile?.photo_url) return profile.photo_url;
     return getFallbackAvatar(displayName);
   }, [displayName, profile?.photoUrl, profile?.photo_url]);
+
+  const handleLogout = useCallback(async () => {
+    if (logoutLoading) return;
+    setLogoutLoading(true);
+    setLogoutError("");
+    try {
+      const endpoint = API_BASE_URL
+        ? `${API_BASE_URL.replace(/\/+$/, "")}/auth/logout`
+        : "/api/auth/logout";
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const message =
+          data?.message || data?.error || "Gagal keluar. Coba lagi.";
+        throw new Error(message);
+      }
+
+      router.replace("/login");
+    } catch (error) {
+      setLogoutError(
+        error instanceof Error ? error.message : "Gagal keluar. Coba lagi."
+      );
+      setLogoutLoading(false);
+    }
+  }, [logoutLoading, router]);
 
   const summary = useMemo(
     () => [
@@ -150,11 +184,19 @@ export default function SettingsClient({ profile }) {
           ))}
         </div>
 
+        {logoutError && (
+          <p className="mt-10 text-sm text-red-500 text-center">
+            {logoutError}
+          </p>
+        )}
+
         <button
           type="button"
-          className="mt-12 w-full rounded-full border border-rose-500 py-3 text-sm font-semibold text-rose-500 transition hover:bg-rose-50"
+          onClick={handleLogout}
+          disabled={logoutLoading}
+          className="mt-12 w-full rounded-full border border-rose-500 py-3 text-sm font-semibold text-rose-500 transition hover:bg-rose-50 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Keluar Akun
+          {logoutLoading ? "Keluar…" : "Keluar Akun"}
         </button>
       </section>
     </main>

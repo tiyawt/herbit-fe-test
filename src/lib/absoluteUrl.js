@@ -17,6 +17,8 @@ export function toAbsoluteUrl(url) {
   return `${baseOrigin}${suffix}`;
 }
 
+export const API_BASE_URL = apiClient?.defaults?.baseURL || "";
+
 export function normalizePhotos(data) {
   if (!data) return data;
   if (Array.isArray(data)) {

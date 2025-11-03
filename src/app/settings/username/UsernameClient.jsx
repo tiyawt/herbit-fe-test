@@ -73,10 +73,15 @@ function StatusIcon({ status }) {
 
 function normalize(input) {
   if (!input || typeof input !== "string") return "";
-  return input.replace(/^@+/, "").replace(/[^a-zA-Z0-9_]/g, "").toLowerCase();
+  return input
+    .replace(/^@+/, "")
+    .replace(/[^a-zA-Z0-9_]/g, "")
+    .toLowerCase();
 }
 
-export default function UsernameClient({ currentUsername: initialUsername = "" }) {
+export default function UsernameClient({
+  currentUsername: initialUsername = "",
+}) {
   const router = useRouter();
   const initialNormalized = normalize(initialUsername);
   const [currentUsername, setCurrentUsername] = useState(initialNormalized);
@@ -278,7 +283,7 @@ export default function UsernameClient({ currentUsername: initialUsername = "" }
     <main className="min-h-screen bg-white text-[#0A0A19]">
       <form className="flex min-h-screen flex-col" onSubmit={handleSubmit}>
         <header
-          className="px-4 border-b border-gray-200"
+          className="px-4 border-gray-200"
           style={{ paddingTop: "calc(24px + env(safe-area-inset-top))" }}
         >
           <div className="flex min-h-12 items-center justify-between">
