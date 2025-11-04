@@ -3,11 +3,9 @@
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import api from "@/lib/apiClient";
 
 const SEEN_KEY = "herbit_onboarding_v1";
-const API = (
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api"
-).replace(/\/+$/, "");
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,48 +26,34 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: email.trim(), password }),
+      // 👉 Login pakai apiClient (axios)
+      const res = await api.post("/auth/login", {
+        email: email.trim(),
+        password,
       });
 
-      if (!res.ok) {
-        const ct = res.headers.get("content-type") || "";
-        let msg = "Login gagal";
-        if (ct.includes("application/json")) {
-          const data = await res.json().catch(() => ({}));
-          msg =
-            data?.message ||
-            data?.error?.details ||
-            (res.status === 401
-              ? "Email atau password salah"
-              : res.status === 422
-              ? "Input tidak valid."
-              : `Login gagal (HTTP ${res.status})`);
-        }
-        console.log("[LOGIN] failed:", res.status, msg);
-        throw new Error(msg);
-      }
+      // Ambil token dari body
+      const token = res?.data?.data?.token || res?.data?.token;
+      if (!token) throw new Error("Token tidak ditemukan di response.");
 
-      // ✅ Parse response untuk ambil token
-      const data = await res.json();
-      console.log("[LOGIN] success", data);
+      // Simpan token (Bearer flow)
+      localStorage.setItem("access_token", token);
 
-      // ✅ Simpan token dari response body
-      if (data?.data?.token) {
-        localStorage.setItem("access_token", data.data.token);
-        console.log("[LOGIN] token saved to localStorage");
-      }
+      // (Opsional tapi bagus) cek profile untuk validasi
+      await api.get("/auth/me");
 
-      localStorage.setItem("herbit_onboarding_v1", "1");
+      // Tandai onboarding pernah dilihat
+      localStorage.setItem(SEEN_KEY, "1");
 
-      // ✅ Redirect ke home
+      // Gas ke home
       router.replace("/home");
     } catch (e) {
-      console.log("[LOGIN] error:", e?.message);
-      setErr(e.message || "Login gagal. Coba lagi ya.");
+      const msg =
+        e?.response?.data?.message ||
+        e?.message ||
+        "Login gagal. Coba lagi ya.";
+      setErr(msg);
+      console.log("[LOGIN] error:", msg);
     } finally {
       setLoading(false);
     }
@@ -78,7 +62,6 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-white">
       <div className="w-full max-w-sm">
-        {/* Back to splash */}
         <button
           onClick={handleBack}
           className="relative flex items-center justify-center w-12 h-12 rounded-full
@@ -134,7 +117,7 @@ export default function LoginPage() {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-          {/* Error feedback */}
+
           {err && (
             <p className="text-sm text-red-600 mt-1" aria-live="polite">
               {err}
@@ -159,7 +142,7 @@ export default function LoginPage() {
 
         <p className="text-sm text-center mt-2">
           Belum punya akun?{" "}
-          
+          <a
             href="/register"
             className="font-medium text-[#FDBE45] hover:underline"
           >
