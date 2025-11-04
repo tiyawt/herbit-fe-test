@@ -1,14 +1,17 @@
+"use client";
+
+import React from "react";
+import AuthGate from "@/components/AuthGate";
 import BottomNav from "@/components/navigation/BottomNav";
 import { DEFAULT_TABS } from "@/constants";
-import React from "react";
 
-const FeaturesLayout = ({ children }) => {
+export default function FeaturesLayout({ children }) {
   return (
-    <main>
-      {children}
-      <BottomNav tabs={DEFAULT_TABS} activeColor="#FEA800" />
-    </main>
+    <AuthGate fallback={null}>
+      <main>
+        {children}
+        <BottomNav tabs={DEFAULT_TABS} activeColor="#FEA800" />
+      </main>
+    </AuthGate>
   );
-};
-
-export default FeaturesLayout;
+}
