@@ -53,10 +53,20 @@ export default function LoginPage() {
         throw new Error(msg);
       }
 
-      console.log("[LOGIN] success");
+      // ✅ Parse response untuk ambil token
+      const data = await res.json();
+      console.log("[LOGIN] success", data);
+
+      // ✅ Simpan token dari response body
+      if (data?.data?.token) {
+        localStorage.setItem("access_token", data.data.token);
+        console.log("[LOGIN] token saved to localStorage");
+      }
+
       localStorage.setItem("herbit_onboarding_v1", "1");
 
-      router.replace("/");
+      // ✅ Redirect ke home
+      router.replace("/home");
     } catch (e) {
       console.log("[LOGIN] error:", e?.message);
       setErr(e.message || "Login gagal. Coba lagi ya.");
@@ -149,7 +159,7 @@ export default function LoginPage() {
 
         <p className="text-sm text-center mt-2">
           Belum punya akun?{" "}
-          <a
+          
             href="/register"
             className="font-medium text-[#FDBE45] hover:underline"
           >
