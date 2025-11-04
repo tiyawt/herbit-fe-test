@@ -141,14 +141,9 @@ export default function LoginPage() {
         </form>
 
         <p className="text-sm text-center mt-2">
-  Belum punya akun?{" "}
-  <a
-    href="/register"
-    className="font-medium text-[#FDBE45] hover:underline"
-  >
-    Register
-  </a>
-</p>
+          Belum punya akun?{" "}
+          <a href="/register" className="font-medium text-[#FDBE45] hover:underline">Register</a>
+        </p>
 
       </div>
     </main>
