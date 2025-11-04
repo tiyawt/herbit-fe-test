@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { ChevronLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import api from "@/lib/apiClient";
+import api from "@/lib/apiClient"; // <-- penting: pakai client yang sama
 
 const SEEN_KEY = "herbit_onboarding_v1";
 
@@ -12,21 +13,39 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleBack = () => {
+    localStorage.removeItem(SEEN_KEY);
+    router.replace("/");
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
     setErr("");
     setLoading(true);
+
     try {
+      // Login via axios client (konsisten baseURL)
       const res = await api.post("/auth/login", {
         email: email.trim(),
         password,
       });
+
+      // Ambil token dari response body (Bearer flow)
       const token = res?.data?.data?.token || res?.data?.token;
       if (!token) throw new Error("Token tidak ditemukan di response.");
+
+      // Simpan token → interceptor akan attach ke header Authorization
       localStorage.setItem("access_token", token);
+
+      // Optional: validasi sesi
       await api.get("/auth/me");
+
+      // Tandai onboarding sudah dilihat
       localStorage.setItem(SEEN_KEY, "1");
+
+      // Redirect
       router.replace("/home");
     } catch (e) {
       const msg =
@@ -44,7 +63,25 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-white">
       <div className="w-full max-w-sm">
+        {/* Back to splash */}
+        <button
+          onClick={handleBack}
+          className="relative flex items-center justify-center w-12 h-12 rounded-full
+                     bg-[#FFD369] border-2 border-[#FDBE45]
+                     shadow-[0_0_0_4px_rgba(253,190,69,0.6)]
+                     hover:bg-[#ffc632] transition mb-3"
+          type="button"
+        >
+          <ChevronLeft size={18} className="text-black" />
+        </button>
+
         <h1 className="text-2xl font-semibold mb-2">Log in</h1>
+        <p className="text-sm text-gray-500 mb-6">
+          Dengan login kamu setuju pada{" "}
+          <span className="font-medium">Terms of Use</span> dan{" "}
+          <span className="font-medium">Privacy Policy</span> kami.
+        </p>
+
         <form onSubmit={handleSubmit} className="space-y-3">
           <label className="text-sm text-black" htmlFor="email">Email</label>
           <input
@@ -56,22 +93,47 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+
           <label className="text-sm text-black" htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Your password"
-            className="w-full rounded-lg bg-[#FFF3DA] p-4 text-sm outline-none mt-1"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            minLength={6}
-            required
-          />
-          {err && <p className="text-sm text-red-600 mt-1">{err}</p>}
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Your password"
+              className="w-full rounded-lg bg-[#FFF3DA] p-4 text-sm outline-none mt-1 pr-12"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              tabIndex={-1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
+          {err && (
+            <p className="text-sm text-red-600 mt-1" aria-live="polite">
+              {err}
+            </p>
+          )}
+
+          <div className="text-right text-sm text-gray-500">
+            <a href="/forgot-password" className="hover:underline">
+              Lupa password?
+            </a>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg bg-[#FFD369] font-medium hover:bg-[#ffc632] disabled:opacity-60 disabled:cursor-not-allowed transition"
+            className="w-full py-3 rounded-lg bg-[#FFD369] font-medium hover:bg-[#ffc632]
+                       disabled:opacity-60 disabled:cursor-not-allowed transition"
           >
             {loading ? "Signing in…" : "Log in"}
           </button>
@@ -79,7 +141,9 @@ export default function LoginPage() {
 
         <p className="text-sm text-center mt-2">
           Belum punya akun?{" "}
-          <a href="/register" className="font-medium text-[#FDBE45] hover:underline">Register</a>
+          <a href="/register" className="font-medium text-[#FDBE45] hover:underline">
+            Register
+          </a>
         </p>
       </div>
     </main>
