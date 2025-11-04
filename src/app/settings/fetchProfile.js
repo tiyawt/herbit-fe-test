@@ -1,7 +1,14 @@
+// app/settings/fetchProfile.js
 import { cookies } from "next/headers";
-import apiClient from "@/lib/apiClient";
+import axios from "axios";
 import { normalizePhotos } from "@/lib/absoluteUrl";
-export const dynamic = 'force-dynamic'
+
+export const dynamic = 'force-dynamic';
+
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 
+                process.env.NEXT_PUBLIC_API_URL || 
+                "https://herbit-be-test.vercel.app/api";
+
 export async function fetchProfile() {
   try {
     const cookieStore = await cookies();
@@ -10,15 +17,13 @@ export async function fetchProfile() {
       .map(({ name, value }) => `${name}=${value}`)
       .join("; ");
 
-    const response = await apiClient.get("/auth/me", {
+    const response = await axios.get(`${API_URL}/auth/me`, {
       headers: {
-        ...(cookieHeader ? { Cookie: cookieHeader } : {}),
-        "Cache-Control": "no-cache",
+        Cookie: cookieHeader,
       },
     });
 
     const data = response.data?.data ?? response.data ?? null;
-
     return normalizePhotos(data);
   } catch (error) {
     console.error("Failed to load profile data", error);
