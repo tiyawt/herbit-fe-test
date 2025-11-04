@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import apiClient from "@/lib/apiClient";
 import { normalizePhotos } from "@/lib/absoluteUrl";
-
+export const dynamic = 'force-dynamic'
 export async function fetchProfile() {
   try {
     const cookieStore = await cookies();
