@@ -46,7 +46,7 @@ export default function LoginPage() {
       localStorage.setItem(SEEN_KEY, "1");
 
       // Redirect
-      router.replace("/home");
+      router.replace("/");
     } catch (e) {
       const msg =
         e?.response?.data?.message ||
