@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import api from "@/lib/apiClient";
 
 const SEEN_KEY = "herbit_onboarding_v1";
+const API = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api"
+).replace(/\/+$/, "");
 
 export default function LoginPage() {
   const router = useRouter();
@@ -59,9 +61,11 @@ export default function LoginPage() {
     }
   }
 
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-white">
       <div className="w-full max-w-sm">
+        {/* Back to splash */}
         <button
           onClick={handleBack}
           className="relative flex items-center justify-center w-12 h-12 rounded-full
@@ -117,7 +121,7 @@ export default function LoginPage() {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-
+          {/* Error feedback */}
           {err && (
             <p className="text-sm text-red-600 mt-1" aria-live="polite">
               {err}
@@ -142,9 +146,13 @@ export default function LoginPage() {
 
         <p className="text-sm text-center mt-2">
           Belum punya akun?{" "}
-          <a href="/register" className="font-medium text-[#FDBE45] hover:underline">Register</a>
+          <a
+            href="/register"
+            className="font-medium text-[#FDBE45] hover:underline"
+          >
+            Register
+          </a>
         </p>
-
       </div>
     </main>
   );
