@@ -1,6 +1,6 @@
 import UsernameClient from "./UsernameClient";
 import { fetchProfile } from "../fetchProfile";
-
+export const dynamic = 'force-dynamic'
 function normalizeUsername(username) {
   if (!username || typeof username !== "string") return "";
   const trimmed = username.trim();
